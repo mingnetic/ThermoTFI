@@ -12,7 +12,7 @@ import numpy as np
 import matlab.engine
 
 from scipy.ndimage import binary_erosion, sobel
-from bmrr_shared_helper.matlabEngine import MatlabEngineArray2numpyArray
+from matlabEngine import MatlabEngineArray2numpyArray
 from unwrapping import UnwrappingWrapper
 from helper import simulate_RDF_ppm
 
@@ -168,8 +168,8 @@ class Thermo:
 
         for i in range(shape[4] - 1):
             signal_t = self._signal[:, :, :, :, i + 1]
-            magnitude = np.max(np.abs(signal_t), axis=-1)
-            tmp_mask = magnitude > threshold / 100 * np.max(magnitude)
+            magnitude = np.mean(np.abs(signal_t), axis=-1)
+            tmp_mask = magnitude > threshold / 100 * np.mean(magnitude)
 
             if n_erosions > 0:
                 mask[..., i] = binary_erosion(tmp_mask, iterations=n_erosions)
@@ -194,9 +194,8 @@ class Thermo:
         signal = self._signal
         shape = signal.shape
 
-        diffPhase_ref = np.angle(
-            signal[:, :, :, 1, timeref] * np.conj(signal[:, :, :, 0, timeref])
-        )
+        echoDiff_ref = signal[:, :, :, 1, timeref] * np.conj(signal[:, :, :, 0, timeref])
+        
         cplx_timeref = signal[:, :, :, 0, timeref]
 
         iFreq = np.zeros((*shape[0:3], shape[4] - 1), dtype=np.float32)
@@ -221,11 +220,11 @@ class Thermo:
             if i == 1:
                 iFreq[..., i - 1] = 0
             else:
-                diffPhase = np.angle(
-                    signal[:, :, :, 1, i] * np.conj(signal[:, :, :, 0, i])
-                )
+                echoDiff = signal[:, :, :, 1, i] * np.conj(signal[:, :, :, 0, i])
+            
                 mask = self._tissueMask[..., i - 1]
-                iFreq[..., i - 1] = self.unwrapping(-diffPhase_ref + diffPhase, mask)
+                phase_diff_wrapped = np.angle(echoDiff * np.conj(echoDiff_ref))
+                iFreq[..., i - 1] = self.unwrapping(phase_diff_wrapped, mask)
 
             if self._refTubeMask is not None:
                 cplxdifftubes = signal[:, :, :, 0, i] * np.conj(cplx_timeref)

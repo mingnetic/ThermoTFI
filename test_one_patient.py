@@ -25,23 +25,23 @@ import matplotlib.pyplot as plt
 # Adjust these paths to your local setup
 # -------------------------------------------------------------------------
 CODE_DIR = Path("/Users/minglein/Documents/Code")
-BMRR_DIR = Path("/Users/minglein/Documents/Code/bmrrpython")
+#BMRR_DIR = Path("/Users/minglein/Documents/Code/bmrrpython")
 
 sys.path.insert(0, str(CODE_DIR))
-sys.path.insert(0, str(BMRR_DIR))
+#sys.path.insert(0, str(BMRR_DIR))
 
 # Put thermo.py and funcLib.py either in the same folder as this script,
 # or add their folder here:
 # sys.path.insert(0, "/path/to/your/new/thermo_toolbox")
 
-from bmrr_shared_helper.general_helper import load_nii_array
+from general_helper import load_nii_array
 from thermo import Thermo, load_sorted_mat
 
 
 # -------------------------------------------------------------------------
 # User settings
 # -------------------------------------------------------------------------
-BASE_DIR = Path("/Users/minglein/Documents/DATA/RFHT/test4LMU")
+BASE_DIR = Path("/Users/minglein/Documents/DATA/RFHT/testPhantomLMU")
 PATIENT_ID = None  # e.g. "Patient001"; if None, the first patient folder is used
 
 MAT_FILENAME = "images_b_v7.mat"
